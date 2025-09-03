@@ -4,11 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/**
- * Create Product Request
- *
- * Handles validation for product creation
- */
 class CreateProductRequest extends FormRequest
 {
     /**
@@ -16,7 +11,7 @@ class CreateProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Adjust based on your authorization logic
+        return true;
     }
 
     /**
@@ -27,66 +22,31 @@ class CreateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                'min:2',
-                'unique:products,name'
-            ],
-            'price' => [
-                'required',
-                'numeric',
-                'min:0.01',
-                'max:999999.99',
-                'decimal:0,2'
-            ],
-            'stock' => [
-                'required',
-                'integer',
-                'min:0',
-                'max:999999'
-            ],
-            'description' => [
-                'nullable',
-                'string',
-                'max:1000'
-            ]
+            'name' => ['required', 'string', 'min:2', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
+            'stock' => ['required', 'integer', 'min:0', 'max:999999'],
+            'description' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
     /**
-     * Get custom error messages for validation rules.
-     *
-     * @return array<string, string>
+     * Get custom messages for validator errors.
      */
     public function messages(): array
     {
         return [
-            'name.required' => 'The product name is required.',
-            'name.min' => 'The product name must be at least 2 characters.',
-            'name.unique' => 'A product with this name already exists.',
-            'price.required' => 'The product price is required.',
-            'price.min' => 'The product price must be greater than 0.',
-            'price.decimal' => 'The product price must have at most 2 decimal places.',
-            'stock.required' => 'The product stock is required.',
-            'stock.min' => 'The product stock cannot be negative.',
-            'description.max' => 'The product description cannot exceed 1000 characters.'
-        ];
-    }
-
-    /**
-     * Get custom attribute names for validation errors.
-     *
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'name' => 'product name',
-            'price' => 'product price',
-            'stock' => 'product stock',
-            'description' => 'product description'
+            'name.required' => 'Product name is required.',
+            'name.min' => 'Product name must be at least 2 characters.',
+            'name.max' => 'Product name cannot exceed 255 characters.',
+            'price.required' => 'Product price is required.',
+            'price.numeric' => 'Price must be a valid number.',
+            'price.min' => 'Price must be at least $0.01.',
+            'price.max' => 'Price cannot exceed $999,999.99.',
+            'stock.required' => 'Stock quantity is required.',
+            'stock.integer' => 'Stock must be a whole number.',
+            'stock.min' => 'Stock cannot be negative.',
+            'stock.max' => 'Stock cannot exceed 999,999 units.',
+            'description.max' => 'Description cannot exceed 1000 characters.',
         ];
     }
 }

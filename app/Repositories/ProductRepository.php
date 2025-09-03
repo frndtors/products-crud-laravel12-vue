@@ -2,116 +2,72 @@
 
 namespace App\Repositories;
 
-use App\Contracts\ProductRepositoryInterface;
 use App\DTOs\ProductDTO;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
-/**
- * Product Repository Implementation
- *
- * Handles all database operations for products
- */
-class ProductRepository implements ProductRepositoryInterface
+class ProductRepository
 {
     public function __construct(
         private readonly Product $model
     ) {}
 
-    /**
-     * Get paginated products with optional search
-     */
-    public function getPaginated(int $perPage = 10, ?string $search = null): LengthAwarePaginator
+    public function findAll(): Collection
+    {
+        return $this->model->latest()->get();
+    }
+
+    public function findPaginated(int $perPage = 10, ?string $search = null): LengthAwarePaginator
     {
         $query = $this->model->query();
 
         if ($search) {
-            $query->searchByName($search);
+            $query->where('name', 'like', "%{$search}%");
         }
 
-        return $query->orderBy('created_at', 'desc')
-            ->paginate($perPage)
-            ->withQueryString();
+        return $query->latest()->paginate($perPage);
     }
 
-    /**
-     * Find product by ID
-     */
     public function findById(int $id): ?Product
     {
         return $this->model->find($id);
     }
 
-    /**
-     * Create a new product
-     */
-    public function create(ProductDTO $productDTO): Product
+    public function create(ProductDTO $dto): Product
     {
-        return $this->model->create([
-            'name' => $productDTO->name,
-            'price' => $productDTO->price,
-            'stock' => $productDTO->stock,
-            'description' => $productDTO->description,
-        ]);
+        return $this->model->create($dto->toArray());
     }
 
-    /**
-     * Update an existing product
-     */
-    public function update(int $id, ProductDTO $productDTO): ?Product
+    public function update(Product $product, ProductDTO $dto): bool
     {
-        $product = $this->findById($id);
-
-        if (!$product) {
-            return null;
-        }
-
-        $product->update([
-            'name' => $productDTO->name,
-            'price' => $productDTO->price,
-            'stock' => $productDTO->stock,
-            'description' => $productDTO->description,
-        ]);
-
-        return $product->fresh();
+        return $product->update($dto->toArray());
     }
 
-    /**
-     * Delete a product
-     */
-    public function delete(int $id): bool
+    public function delete(Product $product): bool
     {
-        $product = $this->findById($id);
-
-        if (!$product) {
-            return false;
-        }
-
         return $product->delete();
     }
 
-    /**
-     * Get all products
-     */
-    public function getAll(): Collection
+    public function exists(int $id): bool
     {
-        return $this->model->orderBy('name')->get();
+        return $this->model->where('id', $id)->exists();
     }
 
-    /**
-     * Search products by name
-     */
-    public function searchByName(string $name): Collection
+    public function getCount(): int
     {
-        return $this->model->searchByName($name)->get();
+        return $this->model->count();
     }
 
-    /**
-     * Get products in stock
-     */
-    public function getInStock(): Collection
+    public function getLowStockProducts(int $threshold = 5): Collection
     {
-        return $this->model->inStock()->get();
+        return $this->model->where('stock', '<=', $threshold)
+            ->where('stock', '>', 0)
+            ->get();
+    }
+
+    public function getOutOfStockProducts(): Collection
+    {
+        return $this->model->where('stock', 0)->get();
     }
 }
