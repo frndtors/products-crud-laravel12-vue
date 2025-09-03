@@ -23,7 +23,7 @@ class ProductRepository implements ProductRepositoryInterface
                 ->orWhere('description', 'like', "%{$search}%");
         }
 
-        return $query->latest()->paginate($perPage);
+        return $query->latest()->paginate($perPage)->withQueryString();
     }
 
     public function findById(int $id): ?Product
@@ -68,17 +68,22 @@ class ProductRepository implements ProductRepositoryInterface
     {
         return $this->model->where('stock', '<=', $threshold)
             ->where('stock', '>', 0)
+            ->latest()
             ->get();
     }
 
     public function getOutOfStockProducts(): Collection
     {
-        return $this->model->where('stock', 0)->get();
+        return $this->model->where('stock', 0)
+            ->latest()
+            ->get();
     }
 
     public function getInStock(): Collection
     {
-        return $this->model->where('stock', '>', 0)->get();
+        return $this->model->where('stock', '>', 0)
+            ->latest()
+            ->get();
     }
 
     public function getCount(): int

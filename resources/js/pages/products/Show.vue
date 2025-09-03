@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
-import { ArrowLeft, Edit, Trash2 } from 'lucide-vue-next';
+import { Head, Link } from '@inertiajs/vue3';
+import { ArrowLeft, Edit, Trash2, Package } from 'lucide-vue-next';
 
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -28,136 +28,130 @@ const breadcrumbItems = [
     { title: props.product.name, href: `/products/${props.product.id}` }
 ];
 
-const formatPrice = (price: number) => `$${price.toFixed(2)}`;
+const formatPrice = (price: number) => `$${Number(price).toFixed(2)}`;
+const formatDate = (date: string) => new Date(date).toLocaleDateString();
 
 const getStockBadgeVariant = (stock: number) => {
     if (stock === 0) return 'destructive';
     if (stock <= 5) return 'secondary';
     return 'default';
 };
-
-const getStockText = (stock: number) => {
-    if (stock === 0) return 'Out of Stock';
-    if (stock <= 5) return 'Low Stock';
-    return 'In Stock';
-};
-
-const deleteProduct = () => {
-    if (confirm('Are you sure you want to delete this product?')) {
-        router.delete(`/products/${props.product.id}`);
-    }
-};
-
-const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-};
 </script>
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head :title="product.name" />
+        <Head :title="`Product: ${product.name}`" />
 
-        <div class="flex flex-1 flex-col gap-4 p-4 max-w-4xl mx-auto">
+        <div class="flex flex-1 flex-col gap-4 p-4">
             <!-- Header -->
-            <div class="flex items-center gap-4">
-                <Link href="/products">
-                    <Button variant="ghost" size="sm">
-                        <ArrowLeft class="h-4 w-4" />
-                    </Button>
-                </Link>
-                <div class="flex-1">
-                    <h1 class="text-3xl font-bold tracking-tight">{{ product.name }}</h1>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <Link href="/products">
+                        <Button variant="outline" size="sm">
+                            <ArrowLeft class="h-4 w-4 mr-2" />
+                            Back to Products
+                        </Button>
+                    </Link>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight">{{ product.name }}</h1>
+                        <p class="text-muted-foreground">Product Details</p>
+                    </div>
                 </div>
-
-                <!-- Action Buttons -->
-                <div class="flex gap-3">
+                <div class="flex gap-2">
                     <Link :href="`/products/${product.id}/edit`">
                         <Button variant="outline">
                             <Edit class="mr-2 h-4 w-4" />
                             Edit Product
                         </Button>
                     </Link>
-
-                    <Button variant="destructive" @click="deleteProduct">
-                        <Trash2 class="mr-2 h-4 w-4" />
-                        Delete Product
-                    </Button>
                 </div>
             </div>
 
-            <!-- Product Details Card -->
-            <Card>
-                <CardHeader>
-                    <CardTitle>Product Information</CardTitle>
-                    <CardDescription>
-                        Complete details about this product
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <!-- Product Info Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <!-- Basic Information -->
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-muted-foreground mb-1">Product Name</label>
-                                <p class="text-lg font-semibold">{{ product.name }}</p>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-muted-foreground mb-1">Price</label>
-                                <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ formatPrice(product.price) }}</p>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-muted-foreground mb-1">Stock Status</label>
-                                <div class="flex items-center gap-2">
-                                    <Badge :variant="getStockBadgeVariant(product.stock)">
-                                        {{ product.stock }} units available
-                                    </Badge>
-                                    <span v-if="product.stock <= 5 && product.stock > 0" class="text-sm text-yellow-600 dark:text-yellow-400">
-                                        ({{ getStockText(product.stock) }})
-                                    </span>
-                                    <span v-else-if="product.stock === 0" class="text-sm text-red-600 dark:text-red-400">
-                                        ({{ getStockText(product.stock) }})
-                                    </span>
+            <!-- Product Details -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Main Info -->
+                <div class="lg:col-span-2">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle class="flex items-center gap-2">
+                                <Package class="h-5 w-5" />
+                                Product Information
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-sm font-medium text-muted-foreground">Product Name</label>
+                                    <p class="text-lg font-semibold">{{ product.name }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-muted-foreground">Price</label>
+                                    <p class="text-2xl font-bold text-green-600">{{ formatPrice(product.price) }}</p>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Metadata -->
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-muted-foreground mb-1">Product ID</label>
-                                <p class="text-sm font-mono">#{{ product.id }}</p>
-                            </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-muted-foreground mb-1">Created</label>
-                                <p class="text-sm">{{ formatDate(product.created_at) }}</p>
+                                <label class="text-sm font-medium text-muted-foreground">Stock</label>
+                                <div class="mt-1">
+                                    <Badge :variant="getStockBadgeVariant(product.stock)" class="text-base px-3 py-1">
+                                        {{ product.stock }} units available
+                                    </Badge>
+                                </div>
                             </div>
 
+                            <div v-if="product.description">
+                                <label class="text-sm font-medium text-muted-foreground">Description</label>
+                                <p class="mt-1 text-gray-700 leading-relaxed">{{ product.description }}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <!-- Sidebar Info -->
+                <div class="space-y-6">
+                    <!-- Stock Status -->
+                    <Card>
+                        <CardHeader>
+                            <CardTitle class="text-lg">Stock Status</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div class="text-center py-4">
+                                <div class="text-3xl font-bold mb-2">{{ product.stock }}</div>
+                                <Badge :variant="getStockBadgeVariant(product.stock)" class="mb-4">
+                                    {{ product.stock === 0 ? 'Out of Stock' : product.stock <= 5 ? 'Low Stock' : 'In Stock' }}
+                                </Badge>
+                                <div v-if="product.stock <= 5 && product.stock > 0" class="text-sm text-amber-600">
+                                    ⚠️ Stock is running low
+                                </div>
+                                <div v-if="product.stock === 0" class="text-sm text-red-600">
+                                    ❌ Product is out of stock
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <!-- Metadata -->
+                    <Card>
+                        <CardHeader>
+                            <CardTitle class="text-lg">Metadata</CardTitle>
+                        </CardHeader>
+                        <CardContent class="space-y-3">
                             <div>
-                                <label class="block text-sm font-medium text-muted-foreground mb-1">Last Updated</label>
-                                <p class="text-sm">{{ formatDate(product.updated_at) }}</p>
+                                <label class="text-sm font-medium text-muted-foreground">Product ID</label>
+                                <p class="font-mono">{{ product.id }}</p>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Description -->
-                    <div v-if="product.description" class="border-t pt-6">
-                        <label class="block text-sm font-medium text-muted-foreground mb-2">Description</label>
-                        <div class="prose prose-sm max-w-none dark:prose-invert">
-                            <p class="whitespace-pre-wrap">{{ product.description }}</p>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                            <div>
+                                <label class="text-sm font-medium text-muted-foreground">Created</label>
+                                <p>{{ formatDate(product.created_at) }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-muted-foreground">Last Updated</label>
+                                <p>{{ formatDate(product.updated_at) }}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
         </div>
     </AppLayout>
 </template>

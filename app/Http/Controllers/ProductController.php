@@ -11,7 +11,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
@@ -34,7 +33,6 @@ class ProductController extends Controller
                 'products' => $products,
                 'search' => $search,
                 'perPage' => $perPage,
-                'stats' => $this->productService->getProductStats(),
             ]);
         } catch (\Exception $e) {
             \Log::error('Failed to load products', [
@@ -43,8 +41,16 @@ class ProductController extends Controller
                 'perPage' => $perPage
             ]);
 
+            // Return empty result on error
             return Inertia::render('products/Index', [
-                'products' => collect([]),
+                'products' => [
+                    'data' => [],
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => $perPage,
+                    'total' => 0,
+                    'links' => []
+                ],
                 'search' => $search,
                 'perPage' => $perPage,
                 'error' => 'Failed to load products. Please try again.',
@@ -72,11 +78,6 @@ class ProductController extends Controller
             return redirect()
                 ->route('products.show', $product->id)
                 ->with('success', 'Product created successfully!');
-        } catch (ValidationException $e) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors($e->errors());
         } catch (\Exception $e) {
             \Log::error('Failed to create product', [
                 'error' => $e->getMessage(),
@@ -160,11 +161,6 @@ class ProductController extends Controller
             return redirect()
                 ->route('products.index')
                 ->with('error', 'Product not found.');
-        } catch (ValidationException $e) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors($e->errors());
         } catch (\Exception $e) {
             \Log::error('Failed to update product', [
                 'error' => $e->getMessage(),
