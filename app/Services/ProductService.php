@@ -2,90 +2,88 @@
 
 namespace App\Services;
 
-use App\Contracts\ProductRepositoryInterface;
-use App\DTOs\ProductDTO;
+use App\DTOs\ProductCreateDTO;
+use App\DTOs\ProductUpdateDTO;
 use App\Models\Product;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductService
 {
     public function __construct(
-        private readonly ProductRepositoryInterface $repository
+        private readonly ProductRepositoryInterface $productRepository
     ) {}
-
-    public function getAllProducts(): Collection
-    {
-        return $this->repository->getAll();
-    }
 
     public function getProductsPaginated(int $perPage = 10, ?string $search = null): LengthAwarePaginator
     {
-        // Validate pagination parameters
-        $perPage = $this->validatePerPage($perPage);
+        // Validar y limpiar parámetros
+        $perPage = max(5, min(100, $perPage));
+        $search = !empty($search) ? trim($search) : null;
 
-        return $this->repository->getPaginated($perPage, $search);
+        return $this->productRepository->getPaginatedWithSearch($perPage, $search);
     }
 
     public function getProductById(int $id): Product
     {
-        $product = $this->repository->findById($id);
+        $product = $this->productRepository->findById($id);
 
         if (!$product) {
-            throw new ModelNotFoundException("Product with ID {$id} not found.");
+            throw new \Exception("Producto con ID {$id} no encontrado.");
         }
 
         return $product;
     }
 
-    public function createProduct(ProductDTO $dto): Product
+    public function createProduct(ProductCreateDTO $dto): Product
     {
-        return $this->repository->create($dto);
+        return $this->productRepository->create([
+            'name' => $dto->name,
+            'price' => $dto->price,
+            'stock' => $dto->stock,
+            'description' => $dto->description,
+        ]);
     }
 
-    public function updateProduct(int $id, ProductDTO $dto): Product
+    public function updateProduct(ProductUpdateDTO $dto): Product
     {
-        $product = $this->repository->update($id, $dto);
+        $product = $this->getProductById($dto->id);
 
-        if (!$product) {
-            throw new ModelNotFoundException("Product with ID {$id} not found.");
-        }
-
-        return $product;
+        return $this->productRepository->update($product->id, [
+            'name' => $dto->name,
+            'price' => $dto->price,
+            'stock' => $dto->stock,
+            'description' => $dto->description,
+        ]);
     }
 
     public function deleteProduct(int $id): bool
     {
-        if (!$this->repository->exists($id)) {
-            throw new ModelNotFoundException("Product with ID {$id} not found.");
-        }
-
-        return $this->repository->delete($id);
+        $product = $this->getProductById($id);
+        return $this->productRepository->delete($product->id);
     }
 
-    public function getProductStats(): array
+    public function getAllProducts(): Collection
     {
-        return [
-            'total_products' => $this->repository->getCount(),
-            'low_stock_products' => $this->repository->getLowStockProducts(),
-            'out_of_stock_products' => $this->repository->getOutOfStockProducts(),
-            'in_stock_products' => $this->repository->getInStock(),
-        ];
-    }
-
-    public function productExists(int $id): bool
-    {
-        return $this->repository->exists($id);
+        return $this->productRepository->getAll();
     }
 
     public function searchProducts(string $query): Collection
     {
-        return $this->repository->searchByName($query);
+        if (empty(trim($query))) {
+            return collect();
+        }
+
+        return $this->productRepository->search(trim($query));
     }
 
-    private function validatePerPage(int $perPage): int
+    public function getProductsByStock(int $maxStock = 5): Collection
     {
-        return max(1, min($perPage, 100)); // Between 1 and 100
+        return $this->productRepository->findByStockLessThanOrEqual($maxStock);
+    }
+
+    public function getOutOfStockProducts(): Collection
+    {
+        return $this->productRepository->findByStock(0);
     }
 }

@@ -2,97 +2,77 @@
 
 namespace App\Repositories;
 
-use App\Contracts\ProductRepositoryInterface;
-use App\DTOs\ProductDTO;
 use App\Models\Product;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class ProductRepository implements ProductRepositoryInterface
 {
-    public function __construct(
-        private readonly Product $model
-    ) {}
-
-    public function getPaginated(int $perPage = 10, ?string $search = null): LengthAwarePaginator
+    public function getAll(): Collection
     {
-        $query = $this->model->query();
-
-        if ($search) {
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
-        }
-
-        return $query->latest()->paginate($perPage)->withQueryString();
+        return Product::orderBy('created_at', 'desc')->get();
     }
 
     public function findById(int $id): ?Product
     {
-        return $this->model->find($id);
+        return Product::find($id);
     }
 
-    public function create(ProductDTO $productDTO): Product
+    public function create(array $data): Product
     {
-        return $this->model->create($productDTO->toArray());
+        return Product::create($data);
     }
 
-    public function update(int $id, ProductDTO $productDTO): ?Product
+    public function update(int $id, array $data): Product
     {
-        $product = $this->findById($id);
-
-        if (!$product) {
-            return null;
-        }
-
-        $product->update($productDTO->toArray());
+        $product = Product::findOrFail($id);
+        $product->update($data);
         return $product->fresh();
     }
 
     public function delete(int $id): bool
     {
-        $product = $this->findById($id);
-        return $product ? $product->delete() : false;
+        return Product::destroy($id) > 0;
     }
 
-    public function getAll(): Collection
+    public function getPaginatedWithSearch(int $perPage = 10, ?string $search = null): LengthAwarePaginator
     {
-        return $this->model->latest()->get();
+        $query = Product::query()->orderBy('created_at', 'desc');
+
+        if (!empty($search)) {
+            $searchTerm = '%' . $search . '%';
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', $searchTerm)
+                    ->orWhere('description', 'like', $searchTerm);
+            });
+        }
+
+        return $query->paginate($perPage)->withQueryString();
     }
 
-    public function searchByName(string $name): Collection
+    public function search(string $query): Collection
     {
-        return $this->model->where('name', 'like', "%{$name}%")->get();
+        $searchTerm = '%' . $query . '%';
+
+        return Product::where('name', 'like', $searchTerm)
+            ->orWhere('description', 'like', $searchTerm)
+            ->orderBy('name')
+            ->get();
     }
 
-    public function getLowStockProducts(int $threshold = 5): Collection
+    public function findByStock(int $stock): Collection
     {
-        return $this->model->where('stock', '<=', $threshold)
+        return Product::where('stock', $stock)
+            ->orderBy('name')
+            ->get();
+    }
+
+    public function findByStockLessThanOrEqual(int $maxStock): Collection
+    {
+        return Product::where('stock', '<=', $maxStock)
             ->where('stock', '>', 0)
-            ->latest()
+            ->orderBy('stock')
             ->get();
-    }
-
-    public function getOutOfStockProducts(): Collection
-    {
-        return $this->model->where('stock', 0)
-            ->latest()
-            ->get();
-    }
-
-    public function getInStock(): Collection
-    {
-        return $this->model->where('stock', '>', 0)
-            ->latest()
-            ->get();
-    }
-
-    public function getCount(): int
-    {
-        return $this->model->count();
-    }
-
-    public function exists(int $id): bool
-    {
-        return $this->model->where('id', $id)->exists();
     }
 }
