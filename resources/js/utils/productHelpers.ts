@@ -1,10 +1,10 @@
-import type { Product, StockStatus } from '@/types';
+import type { Product } from '@/types';
 
 export const ProductHelpers = {
     /**
      * Determina el estado del stock basado en la cantidad
      */
-    getStockStatus(stock: number): StockStatus {
+    getStockStatus(stock: number): 'in_stock' | 'low_stock' | 'out_of_stock' {
         if (stock === 0) return 'out_of_stock';
         if (stock <= 5) return 'low_stock';
         return 'in_stock';
@@ -40,7 +40,7 @@ export const ProductHelpers = {
     /**
      * Filtra productos por estado de stock
      */
-    filterByStockStatus(products: Product[], status: StockStatus): Product[] {
+    filterByStockStatus(products: Product[], status: 'in_stock' | 'low_stock' | 'out_of_stock'): Product[] {
         return products.filter(product => this.getStockStatus(product.stock) === status);
     },
 

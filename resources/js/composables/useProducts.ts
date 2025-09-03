@@ -2,15 +2,17 @@ import { ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { debounce } from 'lodash-es';
 import { ProductHelpers } from '@/utils/productHelpers';
-import type { Product, PaginatedProducts, SearchProps } from '@/types';
+import type { Product, PaginatedProducts } from '@/types';
 
 export function useProducts(initialSearch?: string, initialPerPage = 10) {
     const searchValue = ref(initialSearch || '');
     const isSearching = ref(false);
     const perPage = ref(initialPerPage);
 
-    // Usar las utilidades centralizadas
-    const { formatPrice, formatDate, getStockBadgeVariant } = ProductHelpers;
+    // Crear funciones que usen ProductHelpers correctamente
+    const formatPrice = (price: number): string => ProductHelpers.formatPrice(price);
+    const formatDate = (date: string): string => ProductHelpers.formatDate(date);
+    const getStockBadgeVariant = (stock: number) => ProductHelpers.getStockBadgeVariant(stock);
 
     const handleSearch = (search?: string) => {
         isSearching.value = true;
@@ -76,7 +78,7 @@ export function useProducts(initialSearch?: string, initialPerPage = 10) {
         hasSearch,
         searchPlaceholder,
 
-        // Methods from ProductHelpers
+        // Helper methods
         formatPrice,
         formatDate,
         getStockBadgeVariant,
