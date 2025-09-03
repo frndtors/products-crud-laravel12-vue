@@ -25,7 +25,7 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Github Repo',
-        href: 'https://github.com/laravel/vue-starter-kit',
+        href: 'https://github.com/frndtors/products-crud-laravel12-vue',
         icon: Folder,
     }
 ];
