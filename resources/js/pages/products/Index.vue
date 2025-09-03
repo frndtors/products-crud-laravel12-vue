@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { Search, Plus, Eye, Edit, Trash2, Package } from 'lucide-vue-next';
+import { debounce } from 'lodash-es';
 
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const searchValue = ref(props.search || '');
+const isSearching = ref(false);
 
 const breadcrumbItems = [
     { title: 'Productos', href: '/products' }
@@ -56,28 +58,53 @@ const getStockBadgeVariant = (stock: number) => {
     return 'default';
 };
 
+// Función de búsqueda inmediata (sin debounce)
 const handleSearch = () => {
+    isSearching.value = true;
     router.get('/products', {
-        search: searchValue.value,
+        search: searchValue.value || undefined,
         per_page: props.perPage,
     }, {
         preserveState: true,
         replace: true,
+        onFinish: () => {
+            isSearching.value = false;
+        }
     });
 };
 
+// Función de búsqueda con debounce para escribir
+const debouncedSearch = debounce(() => {
+    if (searchValue.value !== props.search) {
+        handleSearch();
+    }
+}, 300);
+
+// Función para limpiar búsqueda
 const clearSearch = () => {
     searchValue.value = '';
+    isSearching.value = true;
     router.get('/products', {
         per_page: props.perPage,
     }, {
         preserveState: true,
         replace: true,
+        onFinish: () => {
+            isSearching.value = false;
+        }
     });
 };
 
+// Watcher para búsqueda en tiempo real
+watch(searchValue, (newValue) => {
+    // Si el valor cambió y no es igual al search actual de props
+    if (newValue !== props.search) {
+        debouncedSearch();
+    }
+});
+
 const deleteProduct = (id: number) => {
-    if (confirm('Are you sure you want to delete this product?')) {
+    if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
         router.delete(`/products/${id}`);
     }
 };
@@ -113,13 +140,23 @@ const deleteProduct = (id: number) => {
                                     v-model="searchValue"
                                     placeholder="Buscar productos por nombre..."
                                     class="pl-10"
+                                    :class="{ 'opacity-75': isSearching }"
                                     @keyup.enter="handleSearch"
                                 />
+                                <!-- Loading indicator -->
+                                <div v-if="isSearching" class="absolute right-3 top-1/2 -translate-y-1/2">
+                                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                                </div>
                             </div>
+                            <p class="text-xs text-muted-foreground mt-1">
+                                Escribe para buscar en tiempo real o presiona Enter
+                            </p>
                         </div>
                         <div class="flex gap-2">
-                            <Button @click="handleSearch">Buscar</Button>
-                            <Button v-if="props.search" variant="outline" @click="clearSearch">
+                            <Button @click="handleSearch" :disabled="isSearching">
+                                {{ isSearching ? 'Buscando...' : 'Buscar' }}
+                            </Button>
+                            <Button v-if="props.search" variant="outline" @click="clearSearch" :disabled="isSearching">
                                 Limpiar
                             </Button>
                         </div>
@@ -131,8 +168,11 @@ const deleteProduct = (id: number) => {
             <Card>
                 <CardHeader v-if="products?.data?.length > 0">
                     <CardTitle>Lista de Productos</CardTitle>
-                    <CardDescription >
+                    <CardDescription>
                         Mostrando {{ products?.data?.length || 0 }} de {{ products?.total || 0 }} productos
+                        <span v-if="props.search" class="font-medium">
+                            para "{{ props.search }}"
+                        </span>
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -143,6 +183,7 @@ const deleteProduct = (id: number) => {
                                 v-for="product in products.data"
                                 :key="product.id"
                                 class="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white"
+                                :class="{ 'opacity-75': isSearching }"
                             >
                                 <div class="space-y-3">
                                     <h3 class="font-semibold text-lg truncate">{{ product.name }}</h3>
@@ -224,6 +265,10 @@ const deleteProduct = (id: number) => {
                                 Añadir Producto
                             </Button>
                         </Link>
+                        <Button v-else variant="outline" @click="clearSearch">
+                            <Search class="mr-2 h-4 w-4" />
+                            Ver todos los productos
+                        </Button>
                     </div>
                 </CardContent>
             </Card>
