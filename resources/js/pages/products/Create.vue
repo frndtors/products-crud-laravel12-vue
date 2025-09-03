@@ -30,7 +30,7 @@ const submit = () => {
     <AppLayout :breadcrumbs="breadcrumbItems">
         <Head title="Crear Producto" />
 
-        <div class="flex flex-1 flex-col gap-4 p-4">
+        <div class="flex flex-1 flex-col gap-4 px-12 py-10">
             <!-- Header -->
             <div class="flex items-center gap-4">
                 <Button variant="outline" size="sm" @click="$inertia.visit('/products')">

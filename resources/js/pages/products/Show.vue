@@ -42,7 +42,7 @@ const getStockBadgeVariant = (stock: number) => {
     <AppLayout :breadcrumbs="breadcrumbItems">
         <Head :title="`Producto: ${product.name}`" />
 
-        <div class="flex flex-1 flex-col gap-4 p-4">
+        <div class="flex flex-1 flex-col gap-4 px-12 py-10">
             <!-- Header -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div class="flex items-center gap-4">

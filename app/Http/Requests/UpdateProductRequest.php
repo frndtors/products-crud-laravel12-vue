@@ -35,18 +35,18 @@ class UpdateProductRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Product name is required.',
-            'name.min' => 'Product name must be at least 2 characters.',
-            'name.max' => 'Product name cannot exceed 255 characters.',
-            'price.required' => 'Product price is required.',
-            'price.numeric' => 'Price must be a valid number.',
-            'price.min' => 'Price must be at least $0.01.',
-            'price.max' => 'Price cannot exceed $999,999.99.',
-            'stock.required' => 'Stock quantity is required.',
-            'stock.integer' => 'Stock must be a whole number.',
-            'stock.min' => 'Stock cannot be negative.',
-            'stock.max' => 'Stock cannot exceed 999,999 units.',
-            'description.max' => 'Description cannot exceed 1000 characters.',
+            'name.required' => 'El nombre del producto es obligatorio.',
+            'name.min' => 'El nombre del producto debe tener al menos 2 caracteres.',
+            'name.max' => 'El nombre del producto no puede exceder los 255 caracteres.',
+            'price.required' => 'El precio del producto es obligatorio.',
+            'price.numeric' => 'El precio debe ser un número válido.',
+            'price.min' => 'El precio debe ser al menos $0.01.',
+            'price.max' => 'El precio no puede exceder los $999,999.99.',
+            'stock.required' => 'La cantidad en inventario es obligatoria.',
+            'stock.integer' => 'La cantidad en inventario debe ser un número entero.',
+            'stock.min' => 'La cantidad en inventario no puede ser negativa.',
+            'stock.max' => 'La cantidad en inventario no puede exceder las 999,999 unidades.',
+            'description.max' => 'La descripción no puede exceder los 1000 caracteres.',
         ];
     }
 }
