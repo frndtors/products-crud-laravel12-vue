@@ -37,13 +37,13 @@ class DashboardController extends Controller
                 'stock_distribution' => $this->getStockDistribution($stats),
             ];
 
-            return Inertia::render('Dashboard', $dashboardData);
+            return Inertia::render('dashboard/Index', $dashboardData);
         } catch (\Exception $e) {
             \Log::error('Failed to load dashboard data', [
                 'error' => $e->getMessage()
             ]);
 
-            return Inertia::render('Dashboard', [
+            return Inertia::render('dashboard/Index', [
                 'stats' => [
                     'total_products' => 0,
                     'in_stock_count' => 0,

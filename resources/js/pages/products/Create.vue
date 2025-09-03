@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import { ArrowLeft, Save } from 'lucide-vue-next';
+import { ArrowLeft, Plus } from 'lucide-vue-next';
 
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -8,13 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { ProductFormData } from '@/types';
 
 const breadcrumbItems = [
     { title: 'Productos', href: '/products' },
-    { title: 'Crear Producto', href: '/products/create' }
+    { title: 'Crear', href: '/products/create' }
 ];
 
-const form = useForm({
+const form = useForm<ProductFormData>({
     name: '',
     price: '',
     stock: '',
@@ -39,7 +40,7 @@ const submit = () => {
                 </Button>
                 <div>
                     <h1 class="text-3xl font-bold tracking-tight">Crear Producto</h1>
-                    <p class="text-muted-foreground">Agregue un nuevo producto a su inventario</p>
+                    <p class="text-muted-foreground">Añadir un nuevo producto al inventario</p>
                 </div>
             </div>
 
@@ -62,7 +63,7 @@ const submit = () => {
                                         :class="{ 'border-red-500': form.errors.name }"
                                         required
                                     />
-                                    <div v-if="form.errors.name" class="text-sm text-red-600">
+                                    <div v-if="form.errors.name" class="text-sm text-red-600 dark:text-red-400">
                                         {{ form.errors.name }}
                                     </div>
                                 </div>
@@ -79,14 +80,14 @@ const submit = () => {
                                         :class="{ 'border-red-500': form.errors.price }"
                                         required
                                     />
-                                    <div v-if="form.errors.price" class="text-sm text-red-600">
+                                    <div v-if="form.errors.price" class="text-sm text-red-600 dark:text-red-400">
                                         {{ form.errors.price }}
                                     </div>
                                 </div>
                             </div>
 
                             <div class="space-y-2">
-                                <Label for="stock">Cantidad en Inventario *</Label>
+                                <Label for="stock">Stock *</Label>
                                 <Input
                                     id="stock"
                                     v-model="form.stock"
@@ -96,7 +97,7 @@ const submit = () => {
                                     :class="{ 'border-red-500': form.errors.stock }"
                                     required
                                 />
-                                <div v-if="form.errors.stock" class="text-sm text-red-600">
+                                <div v-if="form.errors.stock" class="text-sm text-red-600 dark:text-red-400">
                                     {{ form.errors.stock }}
                                 </div>
                             </div>
@@ -106,18 +107,18 @@ const submit = () => {
                                 <Textarea
                                     id="description"
                                     v-model="form.description"
-                                    placeholder="Ingrese la descripción del producto (opcional)"
-                                    rows="4"
+                                    placeholder="Ingrese una descripción del producto (opcional)"
                                     :class="{ 'border-red-500': form.errors.description }"
+                                    rows="4"
                                 />
-                                <div v-if="form.errors.description" class="text-sm text-red-600">
+                                <div v-if="form.errors.description" class="text-sm text-red-600 dark:text-red-400">
                                     {{ form.errors.description }}
                                 </div>
                             </div>
 
                             <div class="flex gap-4">
                                 <Button type="submit" :disabled="form.processing">
-                                    <Save class="mr-2 h-4 w-4" />
+                                    <Plus class="mr-2 h-4 w-4" />
                                     {{ form.processing ? 'Creando...' : 'Crear Producto' }}
                                 </Button>
                                 <Button type="button" variant="outline" @click="$inertia.visit('/products')">

@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
 import {
     Package,
     DollarSign,
     TrendingUp,
     AlertTriangle,
-    CheckCircle,
     XCircle,
     Eye,
     Plus,
@@ -17,42 +15,10 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useProducts } from '@/composables/useProducts';
+import type { DashboardData, BreadcrumbItem } from '@/types';
 
-interface Product {
-    id: number;
-    name: string;
-    price: number;
-    stock: number;
-    description?: string;
-    created_at: string;
-    updated_at: string;
-}
-
-interface DashboardStats {
-    total_products: number;
-    in_stock_count: number;
-    low_stock_count: number;
-    out_of_stock_count: number;
-    total_inventory_value: number;
-    average_product_price: number;
-}
-
-interface StockDistribution {
-    in_stock: number;
-    low_stock: number;
-    out_of_stock: number;
-}
-
-interface Props {
-    stats: DashboardStats;
-    recent_products: Product[];
-    low_stock_products: Product[];
-    out_of_stock_products: Product[];
-    stock_distribution: StockDistribution;
-    error?: string;
-}
-
-const props = defineProps<Props>();
+const props = defineProps<DashboardData>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -61,14 +27,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const formatPrice = (price: number) => `L${Number(price).toFixed(2)}`;
-const formatDate = (date: string) => new Date(date).toLocaleDateString();
-
-const getStockBadgeVariant = (stock: number) => {
-    if (stock === 0) return 'destructive';
-    if (stock <= 5) return 'secondary';
-    return 'default';
-};
+const { formatPrice, formatDate, getStockBadgeVariant } = useProducts();
 </script>
 
 <template>
@@ -205,9 +164,9 @@ const getStockBadgeVariant = (stock: number) => {
                             </div>
                             <h3 class="text-lg font-medium mb-2">No se encontraron productos</h3>
                             <p class="text-muted-foreground mb-6">
-                                {{ props.search ? 'Prueba modificando tus criterios de búsqueda.' : 'Comienza creando tu primer producto.' }}
+                                Comienza creando tu primer producto.
                             </p>
-                            <Link v-if="!props.search" href="/products/create">
+                            <Link href="/products/create">
                                 <Button>
                                     <Plus class="mr-2 h-4 w-4" />
                                     Añadir Producto

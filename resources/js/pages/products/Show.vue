@@ -1,21 +1,13 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { ArrowLeft, Edit, Trash2, Package } from 'lucide-vue-next';
+import { ArrowLeft, Edit, Package } from 'lucide-vue-next';
 
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface Product {
-    id: number;
-    name: string;
-    price: number;
-    stock: number;
-    description?: string;
-    created_at: string;
-    updated_at: string;
-}
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useProducts } from '@/composables/useProducts';
+import type { Product } from '@/types';
 
 interface Props {
     product: Product;
@@ -28,14 +20,7 @@ const breadcrumbItems = [
     { title: props.product.name, href: `/products/${props.product.id}` }
 ];
 
-const formatPrice = (price: number) => `L${Number(price).toFixed(2)}`;
-const formatDate = (date: string) => new Date(date).toLocaleDateString();
-
-const getStockBadgeVariant = (stock: number) => {
-    if (stock === 0) return 'destructive';
-    if (stock <= 5) return 'secondary';
-    return 'default';
-};
+const { formatPrice, formatDate, getStockBadgeVariant } = useProducts();
 </script>
 
 <template>

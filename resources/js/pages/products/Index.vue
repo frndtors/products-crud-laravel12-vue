@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import { Search, Plus, Eye, Edit, Trash2, Package } from 'lucide-vue-next';
 import { debounce } from 'lodash-es';
@@ -9,31 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface Product {
-    id: number;
-    name: string;
-    price: number;
-    stock: number;
-    description?: string;
-    created_at: string;
-    updated_at: string;
-}
-
-interface PaginationLink {
-    url: string | null;
-    label: string;
-    active: boolean;
-}
-
-interface PaginatedProducts {
-    data: Product[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    links: PaginationLink[];
-}
+import { useProducts } from '@/composables/useProducts';
+import type { PaginatedProducts } from '@/types';
 
 interface Props {
     products: PaginatedProducts;
@@ -43,35 +20,20 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const searchValue = ref(props.search || '');
-const isSearching = ref(false);
-
 const breadcrumbItems = [
     { title: 'Productos', href: '/products' }
 ];
 
-const formatPrice = (price: number) => `L${Number(price).toFixed(2)}`;
-
-const getStockBadgeVariant = (stock: number) => {
-    if (stock === 0) return 'destructive';
-    if (stock <= 5) return 'secondary';
-    return 'default';
-};
-
-// Función de búsqueda inmediata (sin debounce)
-const handleSearch = () => {
-    isSearching.value = true;
-    router.get('/products', {
-        search: searchValue.value || undefined,
-        per_page: props.perPage,
-    }, {
-        preserveState: true,
-        replace: true,
-        onFinish: () => {
-            isSearching.value = false;
-        }
-    });
-};
+// Use the composable
+const {
+    searchValue,
+    isSearching,
+    formatPrice,
+    getStockBadgeVariant,
+    handleSearch,
+    clearSearch,
+    deleteProduct
+} = useProducts(props.search, props.perPage);
 
 // Función de búsqueda con debounce para escribir
 const debouncedSearch = debounce(() => {
@@ -80,34 +42,12 @@ const debouncedSearch = debounce(() => {
     }
 }, 300);
 
-// Función para limpiar búsqueda
-const clearSearch = () => {
-    searchValue.value = '';
-    isSearching.value = true;
-    router.get('/products', {
-        per_page: props.perPage,
-    }, {
-        preserveState: true,
-        replace: true,
-        onFinish: () => {
-            isSearching.value = false;
-        }
-    });
-};
-
 // Watcher para búsqueda en tiempo real
 watch(searchValue, (newValue) => {
-    // Si el valor cambió y no es igual al search actual de props
     if (newValue !== props.search) {
         debouncedSearch();
     }
 });
-
-const deleteProduct = (id: number) => {
-    if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-        router.delete(`/products/${id}`);
-    }
-};
 </script>
 
 <template>

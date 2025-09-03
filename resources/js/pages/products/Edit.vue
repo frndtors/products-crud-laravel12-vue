@@ -8,16 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface Product {
-    id: number;
-    name: string;
-    price: number;
-    stock: number;
-    description?: string;
-    created_at: string;
-    updated_at: string;
-}
+import type { Product, ProductFormData } from '@/types';
 
 interface Props {
     product: Product;
@@ -26,12 +17,12 @@ interface Props {
 const props = defineProps<Props>();
 
 const breadcrumbItems = [
-    { title: 'Products', href: '/products' },
+    { title: 'Productos', href: '/products' },
     { title: props.product.name, href: `/products/${props.product.id}` },
-    { title: 'editar', href: `/products/${props.product.id}/edit` }
+    { title: 'Editar', href: `/products/${props.product.id}/edit` }
 ];
 
-const form = useForm({
+const form = useForm<ProductFormData>({
     name: props.product.name,
     price: props.product.price.toString(),
     stock: props.product.stock.toString(),
@@ -79,7 +70,7 @@ const submit = () => {
                                         :class="{ 'border-red-500': form.errors.name }"
                                         required
                                     />
-                                    <div v-if="form.errors.name" class="text-sm text-red-600">
+                                    <div v-if="form.errors.name" class="text-sm text-red-600 dark:text-red-400">
                                         {{ form.errors.name }}
                                     </div>
                                 </div>
@@ -96,14 +87,14 @@ const submit = () => {
                                         :class="{ 'border-red-500': form.errors.price }"
                                         required
                                     />
-                                    <div v-if="form.errors.price" class="text-sm text-red-600">
+                                    <div v-if="form.errors.price" class="text-sm text-red-600 dark:text-red-400">
                                         {{ form.errors.price }}
                                     </div>
                                 </div>
                             </div>
 
                             <div class="space-y-2">
-                                <Label for="stock">Cantidad en Inventario *</Label>
+                                <Label for="stock">Stock *</Label>
                                 <Input
                                     id="stock"
                                     v-model="form.stock"
@@ -113,7 +104,7 @@ const submit = () => {
                                     :class="{ 'border-red-500': form.errors.stock }"
                                     required
                                 />
-                                <div v-if="form.errors.stock" class="text-sm text-red-600">
+                                <div v-if="form.errors.stock" class="text-sm text-red-600 dark:text-red-400">
                                     {{ form.errors.stock }}
                                 </div>
                             </div>
@@ -123,11 +114,11 @@ const submit = () => {
                                 <Textarea
                                     id="description"
                                     v-model="form.description"
-                                    placeholder="Ingrese la descripción del producto (opcional)"
-                                    rows="4"
+                                    placeholder="Ingrese una descripción del producto (opcional)"
                                     :class="{ 'border-red-500': form.errors.description }"
+                                    rows="4"
                                 />
-                                <div v-if="form.errors.description" class="text-sm text-red-600">
+                                <div v-if="form.errors.description" class="text-sm text-red-600 dark:text-red-400">
                                     {{ form.errors.description }}
                                 </div>
                             </div>
@@ -135,7 +126,7 @@ const submit = () => {
                             <div class="flex gap-4">
                                 <Button type="submit" :disabled="form.processing">
                                     <Save class="mr-2 h-4 w-4" />
-                                    {{ form.processing ? 'Guardando...' : 'Actualizar Producto' }}
+                                    {{ form.processing ? 'Guardando...' : 'Guardar Cambios' }}
                                 </Button>
                                 <Button type="button" variant="outline" @click="$inertia.visit(`/products/${product.id}`)">
                                     Cancelar
