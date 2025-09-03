@@ -2,8 +2,8 @@
 
 namespace App\DTOs;
 
-use App\Http\Requests\CreateProductRequest;
-use App\Http\Requests\UpdateProductRequest;
+use App\Http\Requests\Products\CreateProductRequest;
+use App\Http\Requests\Products\UpdateProductRequest;
 
 class ProductDTO
 {
