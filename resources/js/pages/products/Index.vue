@@ -35,16 +35,23 @@ const {
     deleteProduct
 } = useProducts(props.search, props.perPage);
 
+// Función mejorada para manejar la búsqueda desde el botón
+const performSearch = () => {
+    const searchTerm = searchValue.value?.trim();
+    handleSearch(searchTerm || undefined);
+};
+
 // Función de búsqueda con debounce para escribir
 const debouncedSearch = debounce(() => {
-    if (searchValue.value !== props.search) {
-        handleSearch();
-    }
+    performSearch();
 }, 300);
 
 // Watcher para búsqueda en tiempo real
 watch(searchValue, (newValue) => {
-    if (newValue !== props.search) {
+    const newTrim = newValue?.trim() || '';
+    const oldTrim = props.search?.trim() || '';
+
+    if (newTrim !== oldTrim) {
         debouncedSearch();
     }
 });
@@ -81,7 +88,7 @@ watch(searchValue, (newValue) => {
                                     placeholder="Buscar productos por nombre..."
                                     class="pl-10"
                                     :class="{ 'opacity-75': isSearching }"
-                                    @keyup.enter="handleSearch"
+                                    @keyup.enter="performSearch"
                                 />
                                 <!-- Loading indicator -->
                                 <div v-if="isSearching" class="absolute right-3 top-1/2 -translate-y-1/2">
@@ -93,7 +100,7 @@ watch(searchValue, (newValue) => {
                             </p>
                         </div>
                         <div class="flex gap-2">
-                            <Button @click="handleSearch" :disabled="isSearching">
+                            <Button @click="performSearch" :disabled="isSearching">
                                 {{ isSearching ? 'Buscando...' : 'Buscar' }}
                             </Button>
                             <Button v-if="props.search" variant="outline" @click="clearSearch" :disabled="isSearching">

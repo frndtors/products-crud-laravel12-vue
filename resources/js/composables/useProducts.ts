@@ -16,12 +16,29 @@ export function useProducts(initialSearch?: string, initialPerPage = 10) {
 
     const handleSearch = (search?: string) => {
         isSearching.value = true;
-        const searchTerm = search !== undefined ? search : searchValue.value;
 
-        router.get('/products', {
-            search: searchTerm || undefined,
+        // Obtener el término de búsqueda limpio
+        let searchTerm: string | undefined;
+        if (search !== undefined) {
+            searchTerm = search;
+        } else {
+            searchTerm = searchValue.value;
+        }
+
+        // Limpiar y validar el término de búsqueda
+        searchTerm = searchTerm && typeof searchTerm === 'string' ? searchTerm.trim() : '';
+
+        // Crear objeto de parámetros limpio
+        const params: Record<string, string | number> = {
             per_page: perPage.value,
-        }, {
+        };
+
+        // Solo agregar search si tiene valor válido
+        if (searchTerm && searchTerm.length > 0) {
+            params.search = searchTerm;
+        }
+
+        router.get('/products', params, {
             preserveState: true,
             replace: true,
             onFinish: () => {
