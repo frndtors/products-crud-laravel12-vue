@@ -145,7 +145,7 @@ const deleteProduct = (id: number) => {
                                 />
                                 <!-- Loading indicator -->
                                 <div v-if="isSearching" class="absolute right-3 top-1/2 -translate-y-1/2">
-                                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-foreground"></div>
                                 </div>
                             </div>
                             <p class="text-xs text-muted-foreground mt-1">
@@ -182,18 +182,18 @@ const deleteProduct = (id: number) => {
                             <div
                                 v-for="product in products.data"
                                 :key="product.id"
-                                class="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white"
+                                class="border rounded-lg p-4 hover:shadow-md transition-all duration-200 bg-card hover:bg-muted/50"
                                 :class="{ 'opacity-75': isSearching }"
                             >
                                 <div class="space-y-3">
-                                    <h3 class="font-semibold text-lg truncate">{{ product.name }}</h3>
-                                    <p class="text-2xl font-bold text-green-600">{{ formatPrice(product.price) }}</p>
+                                    <h3 class="font-semibold text-lg truncate text-card-foreground">{{ product.name }}</h3>
+                                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ formatPrice(product.price) }}</p>
                                     <div class="flex items-center gap-2">
                                         <Badge :variant="getStockBadgeVariant(product.stock)">
                                             {{ product.stock }} uds
                                         </Badge>
                                     </div>
-                                    <p v-if="product.description" class="text-sm text-gray-600 line-clamp-2">
+                                    <p v-if="product.description" class="text-sm text-muted-foreground line-clamp-2">
                                         {{ product.description }}
                                     </p>
                                     <div class="flex gap-2 mt-4">
@@ -213,7 +213,7 @@ const deleteProduct = (id: number) => {
                                             variant="outline"
                                             size="sm"
                                             @click="deleteProduct(product.id)"
-                                            class="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                            class="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/20"
                                         >
                                             <Trash2 class="h-4 w-4" />
                                         </Button>
@@ -230,7 +230,7 @@ const deleteProduct = (id: number) => {
                                         v-if="link.url"
                                         :href="link.url"
                                         :class="[
-                                            'px-3 py-2 text-sm rounded-md border',
+                                            'px-3 py-2 text-sm rounded-md border transition-colors',
                                             link.active
                                                 ? 'bg-primary text-primary-foreground border-primary'
                                                 : 'hover:bg-muted border-border'

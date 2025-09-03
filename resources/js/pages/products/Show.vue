@@ -82,11 +82,11 @@ const getStockBadgeVariant = (stock: number) => {
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="text-sm font-medium text-muted-foreground">Nombre del Producto</label>
-                                    <p class="text-lg font-semibold">{{ product.name }}</p>
+                                    <p class="text-lg font-semibold text-card-foreground">{{ product.name }}</p>
                                 </div>
                                 <div>
                                     <label class="text-sm font-medium text-muted-foreground">Precio</label>
-                                    <p class="text-2xl font-bold text-green-600">{{ formatPrice(product.price) }}</p>
+                                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ formatPrice(product.price) }}</p>
                                 </div>
                             </div>
 
@@ -101,7 +101,7 @@ const getStockBadgeVariant = (stock: number) => {
 
                             <div v-if="product.description">
                                 <label class="text-sm font-medium text-muted-foreground">Descripción</label>
-                                <p class="mt-1 text-gray-700 leading-relaxed">{{ product.description }}</p>
+                                <p class="mt-1 text-card-foreground leading-relaxed">{{ product.description }}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -116,14 +116,14 @@ const getStockBadgeVariant = (stock: number) => {
                         </CardHeader>
                         <CardContent>
                             <div class="text-center py-4">
-                                <div class="text-3xl font-bold mb-2">{{ product.stock }}</div>
+                                <div class="text-3xl font-bold mb-2 text-card-foreground">{{ product.stock }}</div>
                                 <Badge :variant="getStockBadgeVariant(product.stock)" class="mb-4">
-                                    {{ product.stock === 0 ? 'Out of Stock' : product.stock <= 5 ? 'Low Stock' : 'In Stock' }}
+                                    {{ product.stock === 0 ? 'Agotado' : product.stock <= 5 ? 'Stock Bajo' : 'En Stock' }}
                                 </Badge>
-                                <div v-if="product.stock <= 5 && product.stock > 0" class="text-sm text-amber-600">
+                                <div v-if="product.stock <= 5 && product.stock > 0" class="text-sm text-amber-600 dark:text-amber-400">
                                     ⚠️ El stock se está agotando
                                 </div>
-                                <div v-if="product.stock === 0" class="text-sm text-red-600">
+                                <div v-if="product.stock === 0" class="text-sm text-red-600 dark:text-red-400">
                                     ❌ El producto está agotado
                                 </div>
                             </div>
@@ -138,15 +138,15 @@ const getStockBadgeVariant = (stock: number) => {
                         <CardContent class="space-y-3">
                             <div>
                                 <label class="text-sm font-medium text-muted-foreground">ID del Producto</label>
-                                <p class="font-mono">{{ product.id }}</p>
+                                <p class="font-mono text-card-foreground">{{ product.id }}</p>
                             </div>
                             <div>
                                 <label class="text-sm font-medium text-muted-foreground">Creado</label>
-                                <p>{{ formatDate(product.created_at) }}</p>
+                                <p class="text-card-foreground">{{ formatDate(product.created_at) }}</p>
                             </div>
                             <div>
                                 <label class="text-sm font-medium text-muted-foreground">Última Actualización</label>
-                                <p>{{ formatDate(product.updated_at) }}</p>
+                                <p class="text-card-foreground">{{ formatDate(product.updated_at) }}</p>
                             </div>
                         </CardContent>
                     </Card>

@@ -56,7 +56,7 @@ const props = defineProps<Props>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Tablero',
+        title: 'Dashboard',
         href: dashboard().url,
     },
 ];
@@ -79,18 +79,19 @@ const getStockBadgeVariant = (stock: number) => {
             <!-- Welcome Header -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold tracking-tight">Tablero</h1>
+                    <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
                     <p class="text-muted-foreground">Resumen de tu inventario de productos</p>
                 </div>
                 <Link href="/products/create">
                     <Button>
-                        <Plus class="mr-2 h-4 w-4" /> Añadir Producto
+                        <Plus class="mr-2 h-4 w-4" />
+                        Añadir Producto
                     </Button>
                 </Link>
             </div>
 
             <!-- Error Message -->
-            <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+            <div v-if="error" class="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-700 dark:text-red-300">
                 {{ error }}
             </div>
 
@@ -105,7 +106,7 @@ const getStockBadgeVariant = (stock: number) => {
                     <CardContent>
                         <div class="text-2xl font-bold">{{ stats.total_products }}</div>
                         <p class="text-xs text-muted-foreground">
-                            Productos en su inventario
+                            Productos en tu inventario
                         </p>
                     </CardContent>
                 </Card>
@@ -145,7 +146,7 @@ const getStockBadgeVariant = (stock: number) => {
                         <BarChart3 class="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 flex-wrap">
                             <Badge variant="default">{{ stats.in_stock_count }} uds</Badge>
                             <Badge variant="secondary">{{ stats.low_stock_count }} bajo</Badge>
                             <Badge variant="destructive">{{ stats.out_of_stock_count }} agotado</Badge>
@@ -221,22 +222,22 @@ const getStockBadgeVariant = (stock: number) => {
                     <!-- Low Stock Alert -->
                     <Card v-if="low_stock_products.length > 0">
                         <CardHeader>
-                            <CardTitle class="flex items-center gap-2 text-amber-600">
+                            <CardTitle class="flex items-center gap-2 text-amber-600 dark:text-amber-400">
                                 <AlertTriangle class="h-5 w-5" />
                                 Alerta de Stock Bajo
                             </CardTitle>
-                            <CardDescription>Productos con poco stock</CardDescription>
+                            <CardDescription>Productos con bajo inventario</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div class="space-y-2">
                                 <div
                                     v-for="product in low_stock_products"
                                     :key="product.id"
-                                    class="flex items-center justify-between p-2 bg-amber-50 rounded border"
+                                    class="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-950/20 rounded border"
                                 >
                                     <div>
                                         <p class="font-medium text-sm">{{ product.name }}</p>
-                                        <p class="text-xs text-amber-600">Solo quedan {{ product.stock }}</p>
+                                        <p class="text-xs text-amber-600 dark:text-amber-400">{{ product.stock }} unidades restantes</p>
                                     </div>
                                     <Link :href="`/products/${product.id}/edit`">
                                         <Button variant="outline" size="sm" class="text-xs">
@@ -251,9 +252,9 @@ const getStockBadgeVariant = (stock: number) => {
                     <!-- Out of Stock Alert -->
                     <Card v-if="out_of_stock_products.length > 0">
                         <CardHeader>
-                            <CardTitle class="flex items-center gap-2 text-red-600">
+                            <CardTitle class="flex items-center gap-2 text-red-600 dark:text-red-400">
                                 <XCircle class="h-5 w-5" />
-                                Agotado
+                                Sin Stock
                             </CardTitle>
                             <CardDescription>Productos que necesitan reabastecimiento inmediato</CardDescription>
                         </CardHeader>
@@ -262,11 +263,11 @@ const getStockBadgeVariant = (stock: number) => {
                                 <div
                                     v-for="product in out_of_stock_products"
                                     :key="product.id"
-                                    class="flex items-center justify-between p-2 bg-red-50 rounded border"
+                                    class="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/20 rounded border"
                                 >
                                     <div>
                                         <p class="font-medium text-sm">{{ product.name }}</p>
-                                        <p class="text-xs text-red-600">Agotado</p>
+                                        <p class="text-xs text-red-600 dark:text-red-400">Agotado</p>
                                     </div>
                                     <Link :href="`/products/${product.id}/edit`">
                                         <Button variant="outline" size="sm" class="text-xs">
