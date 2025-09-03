@@ -7,12 +7,13 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Services\ProductService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Product Controller
  *
- * Handles HTTP requests for product operations
+ * Handles HTTP requests for product operations using Inertia.js
  */
 class ProductController extends Controller
 {
@@ -23,7 +24,7 @@ class ProductController extends Controller
     /**
      * Display a listing of products with pagination and search
      */
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $search = $request->get('search');
         $perPage = (int) $request->get('per_page', 10);
@@ -33,19 +34,19 @@ class ProductController extends Controller
 
         $products = $this->productService->getPaginatedProducts($perPage, $search);
 
-        return view('products.index', [
+        return Inertia::render('products/Index', [
             'products' => $products,
             'search' => $search,
-            'perPage' => $perPage
+            'perPage' => $perPage,
         ]);
     }
 
     /**
      * Show the form for creating a new product
      */
-    public function create(): View
+    public function create(): Response
     {
-        return view('products.create');
+        return Inertia::render('products/Create');
     }
 
     /**
@@ -73,7 +74,7 @@ class ProductController extends Controller
     /**
      * Display the specified product
      */
-    public function show(int $id): View|RedirectResponse
+    public function show(int $id): Response|RedirectResponse
     {
         $product = $this->productService->findProduct($id);
 
@@ -83,7 +84,7 @@ class ProductController extends Controller
                 ->withErrors(['error' => 'Product not found.']);
         }
 
-        return view('products.show', [
+        return Inertia::render('products/Show', [
             'product' => $product
         ]);
     }
@@ -91,7 +92,7 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified product
      */
-    public function edit(int $id): View|RedirectResponse
+    public function edit(int $id): Response|RedirectResponse
     {
         $product = $this->productService->findProduct($id);
 
@@ -101,7 +102,7 @@ class ProductController extends Controller
                 ->withErrors(['error' => 'Product not found.']);
         }
 
-        return view('products.edit', [
+        return Inertia::render('products/Edit', [
             'product' => $product
         ]);
     }
