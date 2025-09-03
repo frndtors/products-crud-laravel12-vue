@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\DTOs\ProductCreateDTO;
 use App\DTOs\ProductUpdateDTO;
-use App\Http\Requests\ProductCreateRequest;
-use App\Http\Requests\ProductUpdateRequest;
+use App\Http\Requests\Products\CreateProductRequest;
+use App\Http\Requests\Products\UpdateProductRequest;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -58,7 +58,7 @@ class ProductController extends Controller
         return Inertia::render('products/Create');
     }
 
-    public function store(ProductCreateRequest $request)
+    public function store(CreateProductRequest $request)
     {
         try {
             $dto = ProductCreateDTO::fromRequest($request);
@@ -104,7 +104,7 @@ class ProductController extends Controller
         }
     }
 
-    public function update(ProductUpdateRequest $request, int $id)
+    public function update(UpdateProductRequest $request, int $id)
     {
         try {
             $dto = ProductUpdateDTO::fromRequest($request, $id);
