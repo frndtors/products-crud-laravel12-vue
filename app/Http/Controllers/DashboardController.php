@@ -28,8 +28,8 @@ class DashboardController extends Controller
                     'in_stock_count' => $stats['in_stock_products']->count(),
                     'low_stock_count' => $stats['low_stock_products']->count(),
                     'out_of_stock_count' => $stats['out_of_stock_products']->count(),
-                    'total_inventory_value' => $this->calculateTotalInventoryValue(),
-                    'average_product_price' => $this->calculateAverageProductPrice(),
+                    'total_inventory_value' => $this->calculateTotalInventoryValue($stats),
+                    'average_product_price' => $this->calculateAverageProductPrice($stats),
                 ],
                 'recent_products' => $recentProducts->take(5),
                 'low_stock_products' => $stats['low_stock_products']->take(5),
@@ -56,23 +56,32 @@ class DashboardController extends Controller
                 'low_stock_products' => collect([]),
                 'out_of_stock_products' => collect([]),
                 'stock_distribution' => [],
-                'error' => 'Failed to load dashboard data.',
+                'error' => 'Error al cargar los datos del dashboard.',
             ]);
         }
     }
 
-    private function calculateTotalInventoryValue(): float
+    /**
+     * Calcular el valor total del inventario
+     */
+    private function calculateTotalInventoryValue(array $stats): float
     {
-        return $this->productService->getAllProducts()
-            ->sum(fn($product) => $product->price * $product->stock);
+        $allProducts = $this->productService->getAllProducts();
+        return $allProducts->sum(fn($product) => $product->price * $product->stock);
     }
 
-    private function calculateAverageProductPrice(): float
+    /**
+     * Calcular el precio promedio de los productos
+     */
+    private function calculateAverageProductPrice(array $stats): float
     {
-        $products = $this->productService->getAllProducts();
-        return $products->isEmpty() ? 0 : $products->avg('price');
+        $allProducts = $this->productService->getAllProducts();
+        return $allProducts->count() > 0 ? $allProducts->avg('price') : 0;
     }
 
+    /**
+     * Obtener la distribución de stock
+     */
     private function getStockDistribution(array $stats): array
     {
         return [

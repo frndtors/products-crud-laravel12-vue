@@ -86,4 +86,19 @@ class ProductService
     {
         return $this->productRepository->findByStock(0);
     }
+
+    /**
+     * Obtener estadísticas de productos para el dashboard
+     */
+    public function getProductStats(): array
+    {
+        $allProducts = $this->getAllProducts();
+
+        return [
+            'total_products' => $allProducts->count(),
+            'in_stock_products' => $allProducts->filter(fn($p) => $p->stock > 5),
+            'low_stock_products' => $allProducts->filter(fn($p) => $p->stock > 0 && $p->stock <= 5),
+            'out_of_stock_products' => $allProducts->filter(fn($p) => $p->stock === 0),
+        ];
+    }
 }
