@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
@@ -26,11 +27,6 @@ class ProductController extends Controller
         $perPage = (int) $request->query('per_page', 10);
         $search = $request->query('search');
 
-        // Validate per_page parameter
-        if ($perPage < 1 || $perPage > 100) {
-            $perPage = 10;
-        }
-
         try {
             $products = $this->productService->getProductsPaginated($perPage, $search);
 
@@ -38,8 +34,15 @@ class ProductController extends Controller
                 'products' => $products,
                 'search' => $search,
                 'perPage' => $perPage,
+                'stats' => $this->productService->getProductStats(),
             ]);
         } catch (\Exception $e) {
+            \Log::error('Failed to load products', [
+                'error' => $e->getMessage(),
+                'search' => $search,
+                'perPage' => $perPage
+            ]);
+
             return Inertia::render('products/Index', [
                 'products' => collect([]),
                 'search' => $search,
@@ -69,7 +72,17 @@ class ProductController extends Controller
             return redirect()
                 ->route('products.show', $product->id)
                 ->with('success', 'Product created successfully!');
+        } catch (ValidationException $e) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors($e->errors());
         } catch (\Exception $e) {
+            \Log::error('Failed to create product', [
+                'error' => $e->getMessage(),
+                'data' => $request->validated()
+            ]);
+
             return redirect()
                 ->back()
                 ->withInput()
@@ -93,6 +106,11 @@ class ProductController extends Controller
                 ->route('products.index')
                 ->with('error', 'Product not found.');
         } catch (\Exception $e) {
+            \Log::error('Failed to load product details', [
+                'error' => $e->getMessage(),
+                'product_id' => $id
+            ]);
+
             return redirect()
                 ->route('products.index')
                 ->with('error', 'Failed to load product details.');
@@ -115,6 +133,11 @@ class ProductController extends Controller
                 ->route('products.index')
                 ->with('error', 'Product not found.');
         } catch (\Exception $e) {
+            \Log::error('Failed to load product for editing', [
+                'error' => $e->getMessage(),
+                'product_id' => $id
+            ]);
+
             return redirect()
                 ->route('products.index')
                 ->with('error', 'Failed to load product for editing.');
@@ -137,7 +160,18 @@ class ProductController extends Controller
             return redirect()
                 ->route('products.index')
                 ->with('error', 'Product not found.');
+        } catch (ValidationException $e) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors($e->errors());
         } catch (\Exception $e) {
+            \Log::error('Failed to update product', [
+                'error' => $e->getMessage(),
+                'product_id' => $id,
+                'data' => $request->validated()
+            ]);
+
             return redirect()
                 ->back()
                 ->withInput()
@@ -161,6 +195,11 @@ class ProductController extends Controller
                 ->route('products.index')
                 ->with('error', 'Product not found.');
         } catch (\Exception $e) {
+            \Log::error('Failed to delete product', [
+                'error' => $e->getMessage(),
+                'product_id' => $id
+            ]);
+
             return redirect()
                 ->route('products.index')
                 ->with('error', 'Failed to delete product. Please try again.');

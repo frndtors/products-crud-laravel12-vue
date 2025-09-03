@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Contracts\ProductRepositoryInterface;
 use App\DTOs\ProductDTO;
 use App\Models\Product;
-use App\Repositories\ProductRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -12,17 +12,20 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ProductService
 {
     public function __construct(
-        private readonly ProductRepository $repository
+        private readonly ProductRepositoryInterface $repository
     ) {}
 
     public function getAllProducts(): Collection
     {
-        return $this->repository->findAll();
+        return $this->repository->getAll();
     }
 
     public function getProductsPaginated(int $perPage = 10, ?string $search = null): LengthAwarePaginator
     {
-        return $this->repository->findPaginated($perPage, $search);
+        // Validate pagination parameters
+        $perPage = $this->validatePerPage($perPage);
+
+        return $this->repository->getPaginated($perPage, $search);
     }
 
     public function getProductById(int $id): Product
@@ -43,18 +46,22 @@ class ProductService
 
     public function updateProduct(int $id, ProductDTO $dto): Product
     {
-        $product = $this->getProductById($id);
+        $product = $this->repository->update($id, $dto);
 
-        $this->repository->update($product, $dto);
+        if (!$product) {
+            throw new ModelNotFoundException("Product with ID {$id} not found.");
+        }
 
-        return $product->fresh();
+        return $product;
     }
 
     public function deleteProduct(int $id): bool
     {
-        $product = $this->getProductById($id);
+        if (!$this->repository->exists($id)) {
+            throw new ModelNotFoundException("Product with ID {$id} not found.");
+        }
 
-        return $this->repository->delete($product);
+        return $this->repository->delete($id);
     }
 
     public function getProductStats(): array
@@ -63,11 +70,22 @@ class ProductService
             'total_products' => $this->repository->getCount(),
             'low_stock_products' => $this->repository->getLowStockProducts(),
             'out_of_stock_products' => $this->repository->getOutOfStockProducts(),
+            'in_stock_products' => $this->repository->getInStock(),
         ];
     }
 
     public function productExists(int $id): bool
     {
         return $this->repository->exists($id);
+    }
+
+    public function searchProducts(string $query): Collection
+    {
+        return $this->repository->searchByName($query);
+    }
+
+    private function validatePerPage(int $perPage): int
+    {
+        return max(1, min($perPage, 100)); // Between 1 and 100
     }
 }

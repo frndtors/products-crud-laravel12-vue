@@ -13,8 +13,14 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(ProductRepository::class, function ($app) {
+        // Bind ProductRepositoryInterface to ProductRepository
+        $this->app->singleton(ProductRepositoryInterface::class, function ($app) {
             return new ProductRepository($app->make(\App\Models\Product::class));
+        });
+
+        // Also bind the concrete class for backward compatibility
+        $this->app->singleton(ProductRepository::class, function ($app) {
+            return $app->make(ProductRepositoryInterface::class);
         });
     }
 

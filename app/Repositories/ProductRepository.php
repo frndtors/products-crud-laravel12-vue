@@ -2,28 +2,25 @@
 
 namespace App\Repositories;
 
+use App\Contracts\ProductRepositoryInterface;
 use App\DTOs\ProductDTO;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
-class ProductRepository
+class ProductRepository implements ProductRepositoryInterface
 {
     public function __construct(
         private readonly Product $model
     ) {}
 
-    public function findAll(): Collection
-    {
-        return $this->model->latest()->get();
-    }
-
-    public function findPaginated(int $perPage = 10, ?string $search = null): LengthAwarePaginator
+    public function getPaginated(int $perPage = 10, ?string $search = null): LengthAwarePaginator
     {
         $query = $this->model->query();
 
         if ($search) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
         }
 
         return $query->latest()->paginate($perPage);
@@ -34,29 +31,37 @@ class ProductRepository
         return $this->model->find($id);
     }
 
-    public function create(ProductDTO $dto): Product
+    public function create(ProductDTO $productDTO): Product
     {
-        return $this->model->create($dto->toArray());
+        return $this->model->create($productDTO->toArray());
     }
 
-    public function update(Product $product, ProductDTO $dto): bool
+    public function update(int $id, ProductDTO $productDTO): ?Product
     {
-        return $product->update($dto->toArray());
+        $product = $this->findById($id);
+
+        if (!$product) {
+            return null;
+        }
+
+        $product->update($productDTO->toArray());
+        return $product->fresh();
     }
 
-    public function delete(Product $product): bool
+    public function delete(int $id): bool
     {
-        return $product->delete();
+        $product = $this->findById($id);
+        return $product ? $product->delete() : false;
     }
 
-    public function exists(int $id): bool
+    public function getAll(): Collection
     {
-        return $this->model->where('id', $id)->exists();
+        return $this->model->latest()->get();
     }
 
-    public function getCount(): int
+    public function searchByName(string $name): Collection
     {
-        return $this->model->count();
+        return $this->model->where('name', 'like', "%{$name}%")->get();
     }
 
     public function getLowStockProducts(int $threshold = 5): Collection
@@ -69,5 +74,20 @@ class ProductRepository
     public function getOutOfStockProducts(): Collection
     {
         return $this->model->where('stock', 0)->get();
+    }
+
+    public function getInStock(): Collection
+    {
+        return $this->model->where('stock', '>', 0)->get();
+    }
+
+    public function getCount(): int
+    {
+        return $this->model->count();
+    }
+
+    public function exists(int $id): bool
+    {
+        return $this->model->where('id', $id)->exists();
     }
 }
