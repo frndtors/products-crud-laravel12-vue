@@ -24,11 +24,11 @@ interface Props {
 const props = defineProps<Props>();
 
 const breadcrumbItems = [
-    { title: 'Products', href: '/products' },
+    { title: 'Productos', href: '/products' },
     { title: props.product.name, href: `/products/${props.product.id}` }
 ];
 
-const formatPrice = (price: number) => `$${Number(price).toFixed(2)}`;
+const formatPrice = (price: number) => `L${Number(price).toFixed(2)}`;
 const formatDate = (date: string) => new Date(date).toLocaleDateString();
 
 const getStockBadgeVariant = (stock: number) => {
@@ -40,7 +40,7 @@ const getStockBadgeVariant = (stock: number) => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head :title="`Product: ${product.name}`" />
+        <Head :title="`Producto: ${product.name}`" />
 
         <div class="flex flex-1 flex-col gap-4 p-4">
             <!-- Header -->
@@ -49,19 +49,19 @@ const getStockBadgeVariant = (stock: number) => {
                     <Link href="/products">
                         <Button variant="outline" size="sm">
                             <ArrowLeft class="h-4 w-4 mr-2" />
-                            Back to Products
+                            Regresar a Productos
                         </Button>
                     </Link>
                     <div>
                         <h1 class="text-3xl font-bold tracking-tight">{{ product.name }}</h1>
-                        <p class="text-muted-foreground">Product Details</p>
+                        <p class="text-muted-foreground">Detalles del Producto</p>
                     </div>
                 </div>
                 <div class="flex gap-2">
                     <Link :href="`/products/${product.id}/edit`">
                         <Button variant="outline">
                             <Edit class="mr-2 h-4 w-4" />
-                            Edit Product
+                            Editar Producto
                         </Button>
                     </Link>
                 </div>
@@ -75,17 +75,17 @@ const getStockBadgeVariant = (stock: number) => {
                         <CardHeader>
                             <CardTitle class="flex items-center gap-2">
                                 <Package class="h-5 w-5" />
-                                Product Information
+                                Información del Producto
                             </CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="text-sm font-medium text-muted-foreground">Product Name</label>
+                                    <label class="text-sm font-medium text-muted-foreground">Nombre del Producto</label>
                                     <p class="text-lg font-semibold">{{ product.name }}</p>
                                 </div>
                                 <div>
-                                    <label class="text-sm font-medium text-muted-foreground">Price</label>
+                                    <label class="text-sm font-medium text-muted-foreground">Precio</label>
                                     <p class="text-2xl font-bold text-green-600">{{ formatPrice(product.price) }}</p>
                                 </div>
                             </div>
@@ -94,13 +94,13 @@ const getStockBadgeVariant = (stock: number) => {
                                 <label class="text-sm font-medium text-muted-foreground">Stock</label>
                                 <div class="mt-1">
                                     <Badge :variant="getStockBadgeVariant(product.stock)" class="text-base px-3 py-1">
-                                        {{ product.stock }} units available
+                                        {{ product.stock }} Unidades Disponibles
                                     </Badge>
                                 </div>
                             </div>
 
                             <div v-if="product.description">
-                                <label class="text-sm font-medium text-muted-foreground">Description</label>
+                                <label class="text-sm font-medium text-muted-foreground">Descripción</label>
                                 <p class="mt-1 text-gray-700 leading-relaxed">{{ product.description }}</p>
                             </div>
                         </CardContent>
@@ -112,7 +112,7 @@ const getStockBadgeVariant = (stock: number) => {
                     <!-- Stock Status -->
                     <Card>
                         <CardHeader>
-                            <CardTitle class="text-lg">Stock Status</CardTitle>
+                            <CardTitle class="text-lg">Estado del Inventario</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div class="text-center py-4">
@@ -121,10 +121,10 @@ const getStockBadgeVariant = (stock: number) => {
                                     {{ product.stock === 0 ? 'Out of Stock' : product.stock <= 5 ? 'Low Stock' : 'In Stock' }}
                                 </Badge>
                                 <div v-if="product.stock <= 5 && product.stock > 0" class="text-sm text-amber-600">
-                                    ⚠️ Stock is running low
+                                    ⚠️ El stock se está agotando
                                 </div>
                                 <div v-if="product.stock === 0" class="text-sm text-red-600">
-                                    ❌ Product is out of stock
+                                    ❌ El producto está agotado
                                 </div>
                             </div>
                         </CardContent>
@@ -137,15 +137,15 @@ const getStockBadgeVariant = (stock: number) => {
                         </CardHeader>
                         <CardContent class="space-y-3">
                             <div>
-                                <label class="text-sm font-medium text-muted-foreground">Product ID</label>
+                                <label class="text-sm font-medium text-muted-foreground">ID del Producto</label>
                                 <p class="font-mono">{{ product.id }}</p>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-muted-foreground">Created</label>
+                                <label class="text-sm font-medium text-muted-foreground">Creado</label>
                                 <p>{{ formatDate(product.created_at) }}</p>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-muted-foreground">Last Updated</label>
+                                <label class="text-sm font-medium text-muted-foreground">Última Actualización</label>
                                 <p>{{ formatDate(product.updated_at) }}</p>
                             </div>
                         </CardContent>

@@ -10,8 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const breadcrumbItems = [
-    { title: 'Products', href: '/products' },
-    { title: 'Create Product', href: '/products/create' }
+    { title: 'Productos', href: '/products' },
+    { title: 'Crear Producto', href: '/products/create' }
 ];
 
 const form = useForm({
@@ -28,18 +28,18 @@ const submit = () => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head title="Create Product" />
+        <Head title="Crear Producto" />
 
         <div class="flex flex-1 flex-col gap-4 p-4">
             <!-- Header -->
             <div class="flex items-center gap-4">
                 <Button variant="outline" size="sm" @click="$inertia.visit('/products')">
                     <ArrowLeft class="h-4 w-4 mr-2" />
-                    Back to Products
+                    Volver a Productos
                 </Button>
                 <div>
-                    <h1 class="text-3xl font-bold tracking-tight">Create Product</h1>
-                    <p class="text-muted-foreground">Add a new product to your inventory</p>
+                    <h1 class="text-3xl font-bold tracking-tight">Crear Producto</h1>
+                    <p class="text-muted-foreground">Agregue un nuevo producto a su inventario</p>
                 </div>
             </div>
 
@@ -47,18 +47,18 @@ const submit = () => {
             <div class="max-w-2xl">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Product Information</CardTitle>
+                        <CardTitle>Información del Producto</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form @submit.prevent="submit" class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="space-y-2">
-                                    <Label for="name">Product Name *</Label>
+                                    <Label for="name">Nombre del Producto *</Label>
                                     <Input
                                         id="name"
                                         v-model="form.name"
                                         type="text"
-                                        placeholder="Enter product name"
+                                        placeholder="Ingrese el nombre del producto"
                                         :class="{ 'border-red-500': form.errors.name }"
                                         required
                                     />
@@ -68,7 +68,7 @@ const submit = () => {
                                 </div>
 
                                 <div class="space-y-2">
-                                    <Label for="price">Price *</Label>
+                                    <Label for="price">Precio *</Label>
                                     <Input
                                         id="price"
                                         v-model="form.price"
@@ -86,7 +86,7 @@ const submit = () => {
                             </div>
 
                             <div class="space-y-2">
-                                <Label for="stock">Stock Quantity *</Label>
+                                <Label for="stock">Cantidad en Inventario *</Label>
                                 <Input
                                     id="stock"
                                     v-model="form.stock"
@@ -102,11 +102,11 @@ const submit = () => {
                             </div>
 
                             <div class="space-y-2">
-                                <Label for="description">Description</Label>
+                                <Label for="description">Descripción</Label>
                                 <Textarea
                                     id="description"
                                     v-model="form.description"
-                                    placeholder="Enter product description (optional)"
+                                    placeholder="Ingrese la descripción del producto (opcional)"
                                     rows="4"
                                     :class="{ 'border-red-500': form.errors.description }"
                                 />
@@ -118,10 +118,10 @@ const submit = () => {
                             <div class="flex gap-4">
                                 <Button type="submit" :disabled="form.processing">
                                     <Save class="mr-2 h-4 w-4" />
-                                    {{ form.processing ? 'Creating...' : 'Create Product' }}
+                                    {{ form.processing ? 'Creando...' : 'Crear Producto' }}
                                 </Button>
                                 <Button type="button" variant="outline" @click="$inertia.visit('/products')">
-                                    Cancel
+                                    Cancelar
                                 </Button>
                             </div>
                         </form>

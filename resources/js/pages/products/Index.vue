@@ -45,10 +45,10 @@ const props = defineProps<Props>();
 const searchValue = ref(props.search || '');
 
 const breadcrumbItems = [
-    { title: 'Products', href: '/products' }
+    { title: 'Productos', href: '/products' }
 ];
 
-const formatPrice = (price: number) => `${Number(price).toFixed(2)} HNL`;
+const formatPrice = (price: number) => `L${Number(price).toFixed(2)}`;
 
 const getStockBadgeVariant = (stock: number) => {
     if (stock === 0) return 'destructive';
@@ -85,19 +85,19 @@ const deleteProduct = (id: number) => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head title="Products" />
+        <Head title="Productos" />
 
         <div class="flex flex-1 flex-col gap-4 px-12 py-10">
             <!-- Header -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold tracking-tight">Products</h1>
-                    <p class="text-muted-foreground">Manage your product inventory</p>
+                    <h1 class="text-3xl font-bold tracking-tight">Productos</h1>
+                    <p class="text-muted-foreground">Gestiona tu inventario de productos</p>
                 </div>
-                <Link href="/products/create">
+                <Link href="/products/create" v-if="products?.data?.length > 0">
                     <Button>
                         <Plus class="mr-2 h-4 w-4" />
-                        Add Product
+                        Añadir Producto
                     </Button>
                 </Link>
             </div>
@@ -111,16 +111,16 @@ const deleteProduct = (id: number) => {
                                 <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
                                     v-model="searchValue"
-                                    placeholder="Search products by name..."
+                                    placeholder="Buscar productos por nombre..."
                                     class="pl-10"
                                     @keyup.enter="handleSearch"
                                 />
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <Button @click="handleSearch">Search</Button>
+                            <Button @click="handleSearch">Buscar</Button>
                             <Button v-if="props.search" variant="outline" @click="clearSearch">
-                                Clear
+                                Limpiar
                             </Button>
                         </div>
                     </div>
@@ -129,10 +129,10 @@ const deleteProduct = (id: number) => {
 
             <!-- Products List -->
             <Card>
-                <CardHeader>
-                    <CardTitle>Product List</CardTitle>
-                    <CardDescription>
-                        Showing {{ products?.data?.length || 0 }} of {{ products?.total || 0 }} products
+                <CardHeader v-if="products?.data?.length > 0">
+                    <CardTitle>Lista de Productos</CardTitle>
+                    <CardDescription >
+                        Mostrando {{ products?.data?.length || 0 }} de {{ products?.total || 0 }} productos
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -149,7 +149,7 @@ const deleteProduct = (id: number) => {
                                     <p class="text-2xl font-bold text-green-600">{{ formatPrice(product.price) }}</p>
                                     <div class="flex items-center gap-2">
                                         <Badge :variant="getStockBadgeVariant(product.stock)">
-                                            {{ product.stock }} units
+                                            {{ product.stock }} uds
                                         </Badge>
                                     </div>
                                     <p v-if="product.description" class="text-sm text-gray-600 line-clamp-2">
@@ -159,13 +159,13 @@ const deleteProduct = (id: number) => {
                                         <Link :href="`/products/${product.id}`">
                                             <Button variant="outline" size="sm" class="flex-1">
                                                 <Eye class="h-4 w-4 mr-1" />
-                                                View
+                                                Ver
                                             </Button>
                                         </Link>
                                         <Link :href="`/products/${product.id}/edit`">
                                             <Button variant="outline" size="sm" class="flex-1">
                                                 <Edit class="h-4 w-4 mr-1" />
-                                                Edit
+                                                Editar
                                             </Button>
                                         </Link>
                                         <Button
@@ -214,14 +214,14 @@ const deleteProduct = (id: number) => {
                         <div class="mx-auto h-12 w-12 text-muted-foreground mb-4 flex justify-center">
                             <Package class="h-12 w-12" />
                         </div>
-                        <h3 class="text-lg font-medium mb-2">No products found</h3>
+                        <h3 class="text-lg font-medium mb-2">No se encontraron productos</h3>
                         <p class="text-muted-foreground mb-6">
-                            {{ props.search ? 'Try adjusting your search criteria.' : 'Get started by creating your first product.' }}
+                            {{ props.search ? 'Prueba modificando tus criterios de búsqueda.' : 'Comienza creando tu primer producto.' }}
                         </p>
                         <Link v-if="!props.search" href="/products/create">
                             <Button>
                                 <Plus class="mr-2 h-4 w-4" />
-                                Add Product
+                                Añadir Producto
                             </Button>
                         </Link>
                     </div>
