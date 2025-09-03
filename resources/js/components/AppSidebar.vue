@@ -17,7 +17,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Productos',
-        href: dashboard(),
+        href: { url: '/products' },
         icon: LayoutGrid,
     }
 ];
